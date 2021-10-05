@@ -7,15 +7,19 @@ import numpy as np
 from fit_function import fit_function
 from scipy import stats
 
+import os
+os.environ['KMP_DUPLICATE_LIB_OK'] = 'TRUE'
+
 parser = ArgumentParser(description='NR-VQA')
-parser.add_argument('--gpu_device', type=str, default='cuda:2')
+parser.add_argument('--gpu_device', type=str, default='cuda:0')
 parser.add_argument('--database', type=str, default='KoNViD-1k')
 parser.add_argument('--test_batch_size', type=int, default=1)
-parser.add_argument('--num_workers', type=int, default=3)
+parser.add_argument('--num_workers', type=int, default=0)
 args = parser.parse_args()
 
 if args.database == 'KoNViD-1k':
-    video_dir = '../../database/KoNViD_1k_videos/'
+    # video_dir = '../../database/KoNViD_1k_videos/'
+    video_dir = 'D:/Database/KoNViD-1k-Video-Database/KoNViD_1k_videos/'
     feature_dir = 'data/CNN_features_KoNViD-1k/'
     info = pd.read_csv('data/KoNViD_1k_attributes.csv')
     file_names = info['flickr_id'].values
@@ -30,7 +34,7 @@ if args.database == 'KoNViD-1k':
     scale = mos.max()
     args.scale = scale
 
-split_idx_file = 'data/train_val_test_split.xlsx'
+split_idx_file = 'data/train_val_test_split.xls'
 split_info = pd.read_excel(split_idx_file)
 idx_all = split_info.iloc[:, 0].values
 split_status = split_info['status'].values
@@ -70,7 +74,7 @@ test_PLCC = stats.pearsonr(y_predict, y_label)[0]
 test_SROCC = stats.spearmanr(y_predict, y_label)[0]
 test_RMSE = np.sqrt((((y_predict - y_label) * args.scale) ** 2).mean())
 
-result_excel = 'result/test_result.xlsx'
+result_excel = 'result/test_result.xls'
 result = pd.DataFrame()
 result['PLCC'] = [test_PLCC]
 result['SROCC'] = [test_SROCC]
